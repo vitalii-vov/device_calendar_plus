@@ -1,33 +1,32 @@
-/// Cross-platform calendar shape for UI + storage.
-/// Keep this lean; event-level fields (like time zone) live on events, not calendars.
+/// Represents a user's calendar
 class Calendar {
-  /// Stable identifier (persist me).
+  /// Identifier returned by the platform (Android `Calendars._ID`, iOS `EKCalendar.calendarIdentifier`).
   final String id;
 
-  /// User-visible name ("Work", "Personal", etc.).
+  /// User-facing label shown in native calendar pickers.
   final String name;
 
-  /// Hex like "#RRGGBB" (no alpha). Null if platform didn't supply one.
+  /// Calendar color as a hex string in `#RRGGBB` format, if provided by the OS.
   final String? colorHex;
 
-  /// True if you shouldn't offer edits on this calendar (read-only/subscribed/etc.).
+  /// Whether edits are disallowed (subscribed/shared calendars, server-managed feeds, etc.).
   final bool readOnly;
 
-  /// Account label/email (iCloud/Google/etc.).
+  /// Account name or email that owns the calendar, when exposed by the platform.
   final String? accountName;
 
-  /// Platform account/source type (e.g., "com.google", "CalDAV", "local").
+  /// Platform-specific account type (for example `com.google`, `CalDAV`, or `local` on Android).
   final String? accountType;
 
-  /// True for the user's primary/default calendar on that account/device.
-  /// - Android: `Calendars.IS_PRIMARY`
-  /// - iOS: `eventStore.defaultCalendarForNewEvents` match
+  /// Indicates that the calendar is the default destination for new events on that account/device.
+  ///
+  /// Android maps this to `Calendars.IS_PRIMARY`; iOS matches `eventStore.defaultCalendarForNewEvents`.
   final bool isPrimary;
 
-  /// True if calendar is hidden in OS UI (Android only).
-  /// iOS doesn't expose this; we set false by default there.
+  /// Marks calendars hidden in the Android Calendar UI. iOS always reports `false`.
   final bool hidden;
 
+  /// Creates an immutable calendar description.
   const Calendar({
     required this.id,
     required this.name,
@@ -39,7 +38,7 @@ class Calendar {
     this.hidden = false,
   });
 
-  /// Creates a DeviceCalendar from a platform map.
+  /// Builds a calendar object from a platform channel payload.
   factory Calendar.fromMap(Map<String, dynamic> map) {
     return Calendar(
       id: map['id'] as String,
@@ -53,7 +52,7 @@ class Calendar {
     );
   }
 
-  /// Converts this DeviceCalendar to a platform map.
+  /// Serializes the calendar back into a map for platform channel use.
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -67,6 +66,7 @@ class Calendar {
     };
   }
 
+  /// Returns a copy with selectively overridden fields.
   Calendar copyWith({
     String? id,
     String? name,

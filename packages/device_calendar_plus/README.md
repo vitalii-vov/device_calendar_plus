@@ -376,4 +376,6 @@ This plugin includes both **unit tests** and **integration tests** to ensure rel
 MIT © 2025 Bullet
 See [LICENSE](LICENSE) for details.
 
-> Maintained by [Bullet](https://bullet.to) — a cross-platform task + notes + calendar app built with Flutter.
+---
+
+**Maintained by [Bullet](https://bullet.to)** — a cross-platform task + notes + calendar app built with Flutter.
