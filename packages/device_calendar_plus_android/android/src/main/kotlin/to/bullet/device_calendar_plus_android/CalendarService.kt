@@ -89,7 +89,7 @@ class CalendarService(private val activity: Activity) {
         return Result.success(calendars)
     }
     
-    fun createCalendar(name: String, colorHex: String?): Result<String> {
+    fun createCalendar(name: String, colorHex: String?, accountNameParam: String?): Result<String> {
         // Check for write calendar permission
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_CALENDAR) 
             != PackageManager.PERMISSION_GRANTED) {
@@ -101,7 +101,7 @@ class CalendarService(private val activity: Activity) {
             )
         }
         
-        val accountName = "local"
+        val accountName = accountNameParam ?: "local"
         val accountType = CalendarContract.ACCOUNT_TYPE_LOCAL
         
         // Android automatically creates the account when inserting the first calendar

@@ -136,6 +136,7 @@ class DeviceCalendarPlusAndroidPlugin :
         // Parse arguments
         val name = call.argument<String>("name")
         val colorHex = call.argument<String>("colorHex")
+        val accountName = call.argument<String>("accountName")
         
         if (name == null) {
             result.error(
@@ -146,7 +147,7 @@ class DeviceCalendarPlusAndroidPlugin :
             return
         }
         
-        val serviceResult = service.createCalendar(name, colorHex)
+        val serviceResult = service.createCalendar(name, colorHex, accountName)
         serviceResult.fold(
             onSuccess = { calendarId -> result.success(calendarId) },
             onFailure = { error ->

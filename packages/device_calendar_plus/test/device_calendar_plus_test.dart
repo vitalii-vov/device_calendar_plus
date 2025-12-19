@@ -128,7 +128,11 @@ class MockDeviceCalendarPlusPlatform extends DeviceCalendarPlusPlatform
   }
 
   @override
-  Future<String> createCalendar(String name, String? colorHex) async {
+  Future<String> createCalendar(
+    String name,
+    String? colorHex,
+    CreateCalendarPlatformOptions? platformOptions,
+  ) async {
     if (_exceptionToThrow != null) {
       throw _exceptionToThrow!;
     }

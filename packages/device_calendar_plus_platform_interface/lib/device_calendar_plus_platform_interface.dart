@@ -1,5 +1,9 @@
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
+import 'src/create_calendar_options.dart';
+
+export 'src/create_calendar_options.dart';
+
 /// The interface that implementations of device_calendar_plus must implement.
 ///
 /// Platform implementations should extend this class rather than implement it
@@ -72,12 +76,19 @@ abstract class DeviceCalendarPlusPlatform extends PlatformInterface {
   ///
   /// [name] is the display name for the calendar (required).
   /// [colorHex] is an optional color in #RRGGBB format.
+  /// [platformOptions] is an optional platform-specific options object.
   ///
   /// Returns the ID of the newly created calendar.
   ///
-  /// The calendar is created in the device's local storage.
+  /// The calendar is created in the device's local storage by default.
+  /// Platform-specific options can modify this behavior (e.g., Android
+  /// allows specifying a custom account name).
   /// Requires calendar write permissions.
-  Future<String> createCalendar(String name, String? colorHex);
+  Future<String> createCalendar(
+    String name,
+    String? colorHex,
+    CreateCalendarPlatformOptions? platformOptions,
+  );
 
   /// Updates an existing calendar on the device.
   ///

@@ -37,7 +37,13 @@ class DeviceCalendarPlusIos extends DeviceCalendarPlusPlatform {
   }
 
   @override
-  Future<String> createCalendar(String name, String? colorHex) async {
+  Future<String> createCalendar(
+    String name,
+    String? colorHex,
+    CreateCalendarPlatformOptions? platformOptions,
+  ) async {
+    // iOS does not support platform-specific options for calendar creation
+    // platformOptions is ignored
     final result = await methodChannel.invokeMethod<String>(
       'createCalendar',
       <String, dynamic>{

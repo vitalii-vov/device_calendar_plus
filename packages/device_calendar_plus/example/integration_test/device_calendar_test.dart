@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:device_calendar_plus/device_calendar_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -191,6 +193,29 @@ void main() {
         expect(calendar.accountType, isA<String>());
       }
     });
+
+    test(
+      '6b. Android: Create Calendar with Custom Account Name',
+      () async {
+        final timestamp = DateTime.now().millisecondsSinceEpoch;
+        final calendarName = 'Custom Account Test $timestamp';
+        final customAccountName = 'MyTestApp';
+
+        final calendarId = await plugin.createCalendar(
+          name: calendarName,
+          platformOptions:
+              CreateCalendarOptionsAndroid(accountName: customAccountName),
+        );
+        createdCalendarIds.add(calendarId);
+
+        final calendars = await plugin.listCalendars();
+        final calendar = calendars.firstWhere((cal) => cal.id == calendarId);
+
+        expect(calendar.name, equals(calendarName));
+        expect(calendar.accountName, equals(customAccountName));
+      },
+      skip: !Platform.isAndroid,
+    );
 
     test('7. Update Calendar - Name Only', () async {
       // Create a calendar and update just its name

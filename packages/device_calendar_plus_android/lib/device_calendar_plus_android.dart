@@ -2,6 +2,10 @@ import 'package:device_calendar_plus_platform_interface/device_calendar_plus_pla
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import 'src/create_calendar_options_android.dart';
+
+export 'src/create_calendar_options_android.dart';
+
 /// The Android implementation of [DeviceCalendarPlusPlatform].
 class DeviceCalendarPlusAndroid extends DeviceCalendarPlusPlatform {
   /// The method channel used to interact with the native platform.
@@ -37,12 +41,22 @@ class DeviceCalendarPlusAndroid extends DeviceCalendarPlusPlatform {
   }
 
   @override
-  Future<String> createCalendar(String name, String? colorHex) async {
+  Future<String> createCalendar(
+    String name,
+    String? colorHex,
+    CreateCalendarPlatformOptions? platformOptions,
+  ) async {
+    String? accountName;
+    if (platformOptions is CreateCalendarOptionsAndroid) {
+      accountName = platformOptions.accountName;
+    }
+
     final result = await methodChannel.invokeMethod<String>(
       'createCalendar',
       <String, dynamic>{
         'name': name,
         'colorHex': colorHex,
+        'accountName': accountName,
       },
     );
     return result!;

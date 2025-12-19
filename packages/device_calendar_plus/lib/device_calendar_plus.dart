@@ -7,6 +7,12 @@ import 'src/event.dart';
 import 'src/event_availability.dart';
 import 'src/platform_exception_converter.dart';
 
+export 'package:device_calendar_plus_android/device_calendar_plus_android.dart'
+    show CreateCalendarOptionsAndroid;
+// Platform-specific options
+export 'package:device_calendar_plus_platform_interface/device_calendar_plus_platform_interface.dart'
+    show CreateCalendarPlatformOptions;
+
 export 'src/calendar.dart';
 export 'src/calendar_permission_status.dart';
 export 'src/device_calendar_error.dart';
@@ -191,10 +197,11 @@ class DeviceCalendar {
   ///
   /// [name] is the display name for the calendar (required).
   /// [colorHex] is an optional color in #RRGGBB format (e.g., "#FF5733").
+  /// [platformOptions] is an optional platform-specific options object.
   ///
   /// Returns the ID of the newly created calendar.
   ///
-  /// The calendar is created in the device's local storage.
+  /// The calendar is created in the device's local storage by default.
   /// Requires calendar write permissions - call [requestPermissions] first.
   ///
   /// Example:
@@ -209,10 +216,17 @@ class DeviceCalendar {
   ///   name: 'Work Calendar',
   ///   colorHex: '#FF5733',
   /// );
+  ///
+  /// // Android: Create a calendar with a custom account name
+  /// final androidCalendarId = await plugin.createCalendar(
+  ///   name: 'My App Calendar',
+  ///   platformOptions: CreateCalendarOptionsAndroid(accountName: 'MyApp'),
+  /// );
   /// ```
   Future<String> createCalendar({
     required String name,
     String? colorHex,
+    CreateCalendarPlatformOptions? platformOptions,
   }) async {
     if (name.trim().isEmpty) {
       throw ArgumentError.value(
@@ -224,7 +238,7 @@ class DeviceCalendar {
 
     try {
       final String calendarId = await DeviceCalendarPlusPlatform.instance
-          .createCalendar(name, colorHex);
+          .createCalendar(name, colorHex, platformOptions);
       return calendarId;
     } on PlatformException catch (e, stackTrace) {
       final convertedException =

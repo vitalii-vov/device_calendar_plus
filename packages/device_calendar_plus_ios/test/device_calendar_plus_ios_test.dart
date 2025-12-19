@@ -108,7 +108,7 @@ void main() {
     });
 
     test('createCalendar with name only', () async {
-      final calendarId = await plugin.createCalendar('My Calendar', null);
+      final calendarId = await plugin.createCalendar('My Calendar', null, null);
 
       expect(log.length, equals(1));
       expect(log[0].method, equals('createCalendar'));
@@ -119,7 +119,7 @@ void main() {
 
     test('createCalendar with name and color', () async {
       final calendarId =
-          await plugin.createCalendar('Work Calendar', '#FF5733');
+          await plugin.createCalendar('Work Calendar', '#FF5733', null);
 
       expect(log.length, equals(1));
       expect(log[0].method, equals('createCalendar'));

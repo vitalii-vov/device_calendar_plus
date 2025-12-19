@@ -1,3 +1,9 @@
+## 0.3.2 - 2025-12-19
+
+### Added
+- `CreateCalendarOptionsAndroid` for specifying custom account name when creating calendars
+- `createCalendar()` now accepts optional `accountName` parameter via platform options
+
 ## 0.3.1 - 2025-11-07
 
 ### Fixed

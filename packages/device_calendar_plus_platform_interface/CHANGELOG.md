@@ -1,3 +1,9 @@
+## 0.3.2 - 2025-12-19
+
+### Added
+- `CreateCalendarPlatformOptions` base class for platform-specific calendar creation options
+- `createCalendar()` now accepts optional `platformOptions` parameter
+
 ## 0.3.1 - 2025-11-07
 
 Version sync with other packages. No functional changes.

@@ -109,23 +109,40 @@ void main() {
     });
 
     test('createCalendar with name only', () async {
-      final calendarId = await plugin.createCalendar('My Calendar', null);
+      final calendarId = await plugin.createCalendar('My Calendar', null, null);
 
       expect(log.length, equals(1));
       expect(log[0].method, equals('createCalendar'));
       expect(log[0].arguments['name'], equals('My Calendar'));
       expect(log[0].arguments['colorHex'], isNull);
+      expect(log[0].arguments['accountName'], isNull);
       expect(calendarId, equals('android-calendar-id-456'));
     });
 
     test('createCalendar with name and color', () async {
       final calendarId =
-          await plugin.createCalendar('Work Calendar', '#FF5733');
+          await plugin.createCalendar('Work Calendar', '#FF5733', null);
 
       expect(log.length, equals(1));
       expect(log[0].method, equals('createCalendar'));
       expect(log[0].arguments['name'], equals('Work Calendar'));
       expect(log[0].arguments['colorHex'], equals('#FF5733'));
+      expect(log[0].arguments['accountName'], isNull);
+      expect(calendarId, equals('android-calendar-id-456'));
+    });
+
+    test('createCalendar with custom account name', () async {
+      final calendarId = await plugin.createCalendar(
+        'My App Calendar',
+        null,
+        CreateCalendarOptionsAndroid(accountName: 'MyApp'),
+      );
+
+      expect(log.length, equals(1));
+      expect(log[0].method, equals('createCalendar'));
+      expect(log[0].arguments['name'], equals('My App Calendar'));
+      expect(log[0].arguments['colorHex'], isNull);
+      expect(log[0].arguments['accountName'], equals('MyApp'));
       expect(calendarId, equals('android-calendar-id-456'));
     });
 

@@ -1,3 +1,8 @@
+## 0.3.2 - 2025-12-19
+
+### Changed
+- `createCalendar()` signature updated to accept optional `platformOptions` parameter (ignored on iOS)
+
 ## 0.3.1 - 2025-11-07
 
 ### Fixed
