@@ -1,3 +1,8 @@
+## 0.3.3 - 2025-12-21
+
+### Fixed
+- Fixed parsing of `instanceId` for events with `@` in their event ID (e.g., Google Calendar IDs like `abc123@google.com`)
+
 ## 0.3.2 - 2025-12-19
 
 ### Added
