@@ -284,17 +284,20 @@ public class DeviceCalendarPlusIosPlugin: NSObject, FlutterPlugin, EKEventViewDe
       return
     }
     
-    // Parse instance ID
-    guard let instanceId = args["instanceId"] as? String else {
+    // Parse event ID (required)
+    guard let eventId = args["eventId"] as? String else {
       result(FlutterError(
         code: PlatformExceptionCodes.invalidArguments,
-        message: "Missing or invalid instanceId",
+        message: "Missing or invalid eventId",
         details: nil
       ))
       return
     }
     
-    eventsService.getEvent(instanceId: instanceId) { serviceResult in
+    // Parse timestamp (optional, for recurring events)
+    let timestamp = args["timestamp"] as? Int64
+    
+    eventsService.getEvent(eventId: eventId, timestamp: timestamp) { serviceResult in
       DispatchQueue.main.async {
         switch serviceResult {
         case .success(let event):
@@ -316,17 +319,20 @@ public class DeviceCalendarPlusIosPlugin: NSObject, FlutterPlugin, EKEventViewDe
       return
     }
     
-    // Parse instance ID
-    guard let instanceId = args["instanceId"] as? String else {
+    // Parse event ID (required)
+    guard let eventId = args["eventId"] as? String else {
       result(FlutterError(
         code: PlatformExceptionCodes.invalidArguments,
-        message: "Missing or invalid instanceId",
+        message: "Missing or invalid eventId",
         details: nil
       ))
       return
     }
     
-    eventsService.showEvent(instanceId: instanceId) { serviceResult in
+    // Parse timestamp (optional, for recurring events)
+    let timestamp = args["timestamp"] as? Int64
+    
+    eventsService.showEvent(eventId: eventId, timestamp: timestamp) { serviceResult in
       DispatchQueue.main.async {
         switch serviceResult {
         case .success(let viewController):
@@ -425,18 +431,18 @@ public class DeviceCalendarPlusIosPlugin: NSObject, FlutterPlugin, EKEventViewDe
       return
     }
     
-    // Parse parameters
-    guard let instanceId = args["instanceId"] as? String else {
+    // Parse event ID (required)
+    guard let eventId = args["eventId"] as? String else {
       result(FlutterError(
         code: PlatformExceptionCodes.invalidArguments,
-        message: "Missing required arguments for deleteEvent",
+        message: "Missing or invalid eventId",
         details: nil
       ))
       return
     }
     
     eventsService.deleteEvent(
-      instanceId: instanceId
+      eventId: eventId
     ) { serviceResult in
       DispatchQueue.main.async {
         switch serviceResult {
@@ -459,11 +465,11 @@ public class DeviceCalendarPlusIosPlugin: NSObject, FlutterPlugin, EKEventViewDe
       return
     }
     
-    // Parse required parameters
-    guard let instanceId = args["instanceId"] as? String else {
+    // Parse event ID (required)
+    guard let eventId = args["eventId"] as? String else {
       result(FlutterError(
         code: PlatformExceptionCodes.invalidArguments,
-        message: "Missing required arguments for updateEvent",
+        message: "Missing or invalid eventId",
         details: nil
       ))
       return
@@ -492,7 +498,7 @@ public class DeviceCalendarPlusIosPlugin: NSObject, FlutterPlugin, EKEventViewDe
     }
     
     eventsService.updateEvent(
-      instanceId: instanceId,
+      eventId: eventId,
       title: title,
       startDate: startDate,
       endDate: endDate,

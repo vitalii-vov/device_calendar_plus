@@ -11,7 +11,7 @@ export 'package:device_calendar_plus_android/device_calendar_plus_android.dart'
     show CreateCalendarOptionsAndroid;
 // Platform-specific options
 export 'package:device_calendar_plus_platform_interface/device_calendar_plus_platform_interface.dart'
-    show CreateCalendarPlatformOptions;
+    show CreateCalendarPlatformOptions, InstanceIdParser, ParsedInstanceId;
 
 export 'src/calendar.dart';
 export 'src/calendar_permission_status.dart';
@@ -424,8 +424,14 @@ class DeviceCalendar {
   /// ```
   Future<Event?> getEvent(String id) async {
     try {
+      // Parse the ID to extract eventId and optional timestamp
+      final parsed = InstanceIdParser.parse(id);
+
       final Map<String, dynamic>? rawEvent =
-          await DeviceCalendarPlusPlatform.instance.getEvent(id);
+          await DeviceCalendarPlusPlatform.instance.getEvent(
+        parsed.eventId,
+        parsed.timestamp,
+      );
 
       if (rawEvent == null) {
         return null;
@@ -467,7 +473,13 @@ class DeviceCalendar {
   /// ```
   Future<void> showEventModal(String id) async {
     try {
-      await DeviceCalendarPlusPlatform.instance.showEventModal(id);
+      // Parse the ID to extract eventId and optional timestamp
+      final parsed = InstanceIdParser.parse(id);
+
+      await DeviceCalendarPlusPlatform.instance.showEventModal(
+        parsed.eventId,
+        parsed.timestamp,
+      );
     } on PlatformException catch (e, stackTrace) {
       final convertedException =
           PlatformExceptionConverter.convertPlatformException(e);
@@ -599,7 +611,7 @@ class DeviceCalendar {
   ///
   /// [eventId] identifies the event to delete. You can pass either:
   /// - An event ID (e.g., from `event.eventId`)
-  /// - An instance ID (e.g., from `event.instanceId`) - the event ID will be extracted by the platform
+  /// - An instance ID (e.g., from `event.instanceId`) - the event ID will be extracted
   ///
   /// **For recurring events**: This will delete the ENTIRE series (all past
   /// and future occurrences). Single-instance deletion is not supported to
@@ -615,7 +627,7 @@ class DeviceCalendar {
   /// // Delete using event ID
   /// await plugin.deleteEvent(eventId: event.eventId);
   ///
-  /// // Delete using instance ID (event ID will be extracted by platform)
+  /// // Delete using instance ID (event ID will be extracted)
   /// await plugin.deleteEvent(eventId: event.instanceId);
   /// ```
   Future<void> deleteEvent({required String eventId}) async {
@@ -628,7 +640,10 @@ class DeviceCalendar {
     }
 
     try {
-      await DeviceCalendarPlusPlatform.instance.deleteEvent(eventId);
+      // Parse the ID to extract eventId (timestamp is ignored for delete)
+      final parsed = InstanceIdParser.parse(eventId);
+
+      await DeviceCalendarPlusPlatform.instance.deleteEvent(parsed.eventId);
     } on PlatformException catch (e, stackTrace) {
       final convertedException =
           PlatformExceptionConverter.convertPlatformException(e);
@@ -755,8 +770,11 @@ class DeviceCalendar {
     }
 
     try {
+      // Parse the ID to extract eventId (timestamp is ignored for update)
+      final parsed = InstanceIdParser.parse(eventId);
+
       await DeviceCalendarPlusPlatform.instance.updateEvent(
-        eventId,
+        parsed.eventId,
         title: title,
         startDate: normalizedStartDate,
         endDate: normalizedEndDate,

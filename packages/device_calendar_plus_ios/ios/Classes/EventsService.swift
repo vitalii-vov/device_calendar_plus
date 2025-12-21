@@ -46,31 +46,6 @@ class EventsService {
     self.permissionService = permissionService
   }
   
-  /// Parses an instanceId into its eventId and optional timestamp components.
-  /// The instanceId format is "eventId" for non-recurring events, or "eventId@timestamp" for recurring events.
-  /// Since event IDs (especially from Google Calendar) can contain "@" characters (e.g., "abc123@google.com"),
-  /// we must split from the END of the string, not the beginning.
-  private func parseInstanceId(_ instanceId: String) -> (eventId: String, timestamp: Int64?) {
-    // Find the last "@" in the string
-    guard let lastAtIndex = instanceId.lastIndex(of: "@") else {
-      // No "@" found - the entire string is the eventId
-      return (instanceId, nil)
-    }
-    
-    // Check if the part after the last "@" is a valid timestamp (all digits)
-    let afterAt = String(instanceId[instanceId.index(after: lastAtIndex)...])
-    
-    if let timestamp = Int64(afterAt) {
-      // Valid timestamp found - split here
-      let eventId = String(instanceId[..<lastAtIndex])
-      return (eventId, timestamp)
-    } else {
-      // The part after "@" is not a timestamp (e.g., "@google.com")
-      // The entire string is the eventId
-      return (instanceId, nil)
-    }
-  }
-  
   func retrieveEvents(
     startDate: Date,
     endDate: Date,
@@ -193,7 +168,8 @@ class EventsService {
   }
   
   func getEvent(
-    instanceId: String,
+    eventId: String,
+    timestamp: Int64?,
     completion: @escaping (Result<[String: Any]?, CalendarError>) -> Void
   ) {
     // Check permission
@@ -205,10 +181,7 @@ class EventsService {
       return
     }
     
-    // Parse instanceId: "eventId" or "eventId@timestamp"
-    let (eventId, timestampMillis) = parseInstanceId(instanceId)
-    
-    if let timestampMillis = timestampMillis {
+    if let timestampMillis = timestamp {
       // Recurring event with timestamp
       let occurrenceDate = Date(timeIntervalSince1970: TimeInterval(timestampMillis) / 1000.0)
       
@@ -247,7 +220,8 @@ class EventsService {
   }
   
   func showEvent(
-    instanceId: String,
+    eventId: String,
+    timestamp: Int64?,
     completion: @escaping (Result<EKEventViewController?, CalendarError>) -> Void
   ) {
     // Check permission
@@ -259,11 +233,8 @@ class EventsService {
       return
     }
     
-    // Parse instanceId: "eventId" or "eventId@timestamp"
-    let (eventId, timestampMillis) = parseInstanceId(instanceId)
     let occurrenceDate: Date?
-    
-    if let timestampMillis = timestampMillis {
+    if let timestampMillis = timestamp {
       occurrenceDate = Date(timeIntervalSince1970: TimeInterval(timestampMillis) / 1000.0)
     } else {
       occurrenceDate = nil
@@ -298,7 +269,7 @@ class EventsService {
     guard let foundEvent = event else {
       completion(.failure(CalendarError(
         code: PlatformExceptionCodes.notFound,
-        message: "Event not found with instance ID: \(instanceId)"
+        message: "Event not found with event ID: \(eventId)"
       )))
       return
     }
@@ -398,7 +369,7 @@ class EventsService {
   }
   
   func deleteEvent(
-    instanceId: String,
+    eventId: String,
     completion: @escaping (Result<Void, CalendarError>) -> Void
   ) {
     // Check permission
@@ -410,15 +381,11 @@ class EventsService {
       return
     }
     
-    // Parse instanceId: "eventId" or "eventId@timestamp"
-    // For recurring events, we always delete the entire series, so extract just the eventId
-    let (eventId, _) = parseInstanceId(instanceId)
-    
     // Fetch the master event by eventId
     guard let event = eventStore.event(withIdentifier: eventId) else {
       completion(.failure(CalendarError(
         code: PlatformExceptionCodes.notFound,
-        message: "Event not found with instance ID: \(instanceId)"
+        message: "Event not found with event ID: \(eventId)"
       )))
       return
     }
@@ -438,7 +405,7 @@ class EventsService {
   }
   
   func updateEvent(
-    instanceId: String,
+    eventId: String,
     title: String?,
     startDate: Date?,
     endDate: Date?,
@@ -457,15 +424,11 @@ class EventsService {
       return
     }
     
-    // Parse instanceId: "eventId" or "eventId@timestamp"
-    // For recurring events, we always update the entire series, so extract just the eventId
-    let (eventId, _) = parseInstanceId(instanceId)
-    
     // Fetch the master event by eventId
     guard let foundEvent = eventStore.event(withIdentifier: eventId) else {
       completion(.failure(CalendarError(
         code: PlatformExceptionCodes.notFound,
-        message: "Event not found with instance ID: \(instanceId)"
+        message: "Event not found with event ID: \(eventId)"
       )))
       return
     }

@@ -255,18 +255,19 @@ class DeviceCalendarPlusAndroidPlugin :
         val service = eventsService ?: error("EventsService not initialized - plugin lifecycle error")
         
         // Parse arguments
-        val instanceId = call.argument<String>("instanceId")
+        val eventId = call.argument<String>("eventId")
+        val timestamp = call.argument<Long>("timestamp")
         
-        if (instanceId == null) {
+        if (eventId == null) {
             result.error(
                 PlatformExceptionCodes.INVALID_ARGUMENTS,
-                "Missing or invalid instanceId",
+                "Missing or invalid eventId",
                 null
             )
             return
         }
         
-        val serviceResult = service.getEvent(instanceId)
+        val serviceResult = service.getEvent(eventId, timestamp)
         serviceResult.fold(
             onSuccess = { event -> result.success(event) },
             onFailure = { error ->
@@ -284,12 +285,13 @@ class DeviceCalendarPlusAndroidPlugin :
         val currentActivity = activity ?: error("Activity not initialized - plugin lifecycle error")
         
         // Parse arguments
-        val instanceId = call.argument<String>("instanceId")
+        val eventId = call.argument<String>("eventId")
+        val timestamp = call.argument<Long>("timestamp")
         
-        if (instanceId == null) {
+        if (eventId == null) {
             result.error(
                 PlatformExceptionCodes.INVALID_ARGUMENTS,
-                "Missing or invalid instanceId",
+                "Missing or invalid eventId",
                 null
             )
             return
@@ -298,7 +300,7 @@ class DeviceCalendarPlusAndroidPlugin :
         // Store the result callback to call when activity returns
         showEventModalResult = result
         
-        val serviceResult = service.showEvent(currentActivity, instanceId, SHOW_EVENT_REQUEST_CODE)
+        val serviceResult = service.showEvent(currentActivity, eventId, timestamp, SHOW_EVENT_REQUEST_CODE)
         serviceResult.fold(
             onSuccess = { /* Result will be sent in onActivityResult */ },
             onFailure = { error ->
@@ -369,18 +371,18 @@ class DeviceCalendarPlusAndroidPlugin :
         val service = eventsService ?: error("EventsService not initialized - plugin lifecycle error")
         
         // Parse arguments
-        val instanceId = call.argument<String>("instanceId")
+        val eventId = call.argument<String>("eventId")
         
-        if (instanceId == null) {
+        if (eventId == null) {
             result.error(
                 PlatformExceptionCodes.INVALID_ARGUMENTS,
-                "Missing required arguments for deleteEvent",
+                "Missing or invalid eventId",
                 null
             )
             return
         }
         
-        val serviceResult = service.deleteEvent(instanceId)
+        val serviceResult = service.deleteEvent(eventId)
         serviceResult.fold(
             onSuccess = { result.success(null) },
             onFailure = { error ->
@@ -397,12 +399,12 @@ class DeviceCalendarPlusAndroidPlugin :
         val service = eventsService ?: error("EventsService not initialized - plugin lifecycle error")
         
         // Parse required arguments
-        val instanceId = call.argument<String>("instanceId")
+        val eventId = call.argument<String>("eventId")
         
-        if (instanceId == null) {
+        if (eventId == null) {
             result.error(
                 PlatformExceptionCodes.INVALID_ARGUMENTS,
-                "Missing required arguments for updateEvent",
+                "Missing or invalid eventId",
                 null
             )
             return
@@ -422,7 +424,7 @@ class DeviceCalendarPlusAndroidPlugin :
         val endDate = endDateMillis?.let { java.util.Date(it) }
         
         val serviceResult = service.updateEvent(
-            instanceId,
+            eventId,
             title,
             startDate,
             endDate,

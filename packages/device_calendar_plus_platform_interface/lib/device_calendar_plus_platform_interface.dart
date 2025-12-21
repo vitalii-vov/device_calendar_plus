@@ -3,6 +3,7 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'src/create_calendar_options.dart';
 
 export 'src/create_calendar_options.dart';
+export 'src/instance_id_parser.dart';
 
 /// The interface that implementations of device_calendar_plus must implement.
 ///
@@ -119,24 +120,22 @@ abstract class DeviceCalendarPlusPlatform extends PlatformInterface {
     List<String>? calendarIds,
   );
 
-  /// Retrieves a single event by instance ID.
+  /// Retrieves a single event by event ID and optional timestamp.
   ///
-  /// [instanceId] uniquely identifies the event instance:
-  /// - For non-recurring events: Just the eventId
-  /// - For recurring events: "eventId@rawTimestampMillis" format
+  /// [eventId] is the event identifier.
+  /// [timestamp] is the occurrence timestamp in milliseconds for recurring events.
   ///
   /// Returns event data as a map (including instanceId field), or null if not found.
-  Future<Map<String, dynamic>?> getEvent(String instanceId);
+  Future<Map<String, dynamic>?> getEvent(String eventId, int? timestamp);
 
   /// Shows a calendar event in a modal dialog.
   ///
-  /// [instanceId] uniquely identifies the event instance to show:
-  /// - For non-recurring events: Just the eventId
-  /// - For recurring events: "eventId@rawTimestampMillis" format
+  /// [eventId] is the event identifier.
+  /// [timestamp] is the occurrence timestamp in milliseconds for recurring events.
   ///
   /// On iOS, presents the event in a modal using EKEventViewController.
   /// On Android, opens the event using an Intent with ACTION_VIEW.
-  Future<void> showEventModal(String instanceId);
+  Future<void> showEventModal(String eventId, int? timestamp);
 
   /// Creates a new event in the specified calendar.
   ///
@@ -166,22 +165,18 @@ abstract class DeviceCalendarPlusPlatform extends PlatformInterface {
 
   /// Deletes an event from the device.
   ///
-  /// [instanceId] uniquely identifies the event instance to delete:
-  /// - For non-recurring events: Just the eventId
-  /// - For recurring events: "eventId@rawTimestampMillis" format
+  /// [eventId] is the event identifier.
   ///
   /// **For recurring events**: This will delete the ENTIRE series (all past and
   /// future occurrences). Single-instance deletion is not supported to maintain
   /// consistent behavior across platforms.
   ///
   /// Requires calendar write permissions.
-  Future<void> deleteEvent(String instanceId);
+  Future<void> deleteEvent(String eventId);
 
   /// Updates an existing event on the device.
   ///
-  /// [instanceId] uniquely identifies the event instance to update:
-  /// - For non-recurring events: Just the eventId
-  /// - For recurring events: "eventId@rawTimestampMillis" format
+  /// [eventId] is the event identifier.
   ///
   /// **For recurring events**: This will update the ENTIRE series (all past and
   /// future occurrences). Single-instance updates are not supported to maintain
@@ -199,7 +194,7 @@ abstract class DeviceCalendarPlusPlatform extends PlatformInterface {
   /// At least one field must be provided.
   /// Requires calendar write permissions.
   Future<void> updateEvent(
-    String instanceId, {
+    String eventId, {
     String? title,
     DateTime? startDate,
     DateTime? endDate,

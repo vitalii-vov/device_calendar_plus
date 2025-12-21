@@ -94,21 +94,25 @@ class DeviceCalendarPlusIos extends DeviceCalendarPlusPlatform {
   }
 
   @override
-  Future<Map<String, dynamic>?> getEvent(String instanceId) async {
+  Future<Map<String, dynamic>?> getEvent(String eventId, int? timestamp) async {
     final result = await methodChannel.invokeMethod<Map<dynamic, dynamic>>(
       'getEvent',
       <String, dynamic>{
-        'instanceId': instanceId,
+        'eventId': eventId,
+        'timestamp': timestamp,
       },
     );
     return result != null ? Map<String, dynamic>.from(result) : null;
   }
 
   @override
-  Future<void> showEventModal(String instanceId) async {
+  Future<void> showEventModal(String eventId, int? timestamp) async {
     await methodChannel.invokeMethod<void>(
       'showEventModal',
-      <String, dynamic>{'instanceId': instanceId},
+      <String, dynamic>{
+        'eventId': eventId,
+        'timestamp': timestamp,
+      },
     );
   }
 
@@ -142,18 +146,18 @@ class DeviceCalendarPlusIos extends DeviceCalendarPlusPlatform {
   }
 
   @override
-  Future<void> deleteEvent(String instanceId) async {
+  Future<void> deleteEvent(String eventId) async {
     await methodChannel.invokeMethod<void>(
       'deleteEvent',
       <String, dynamic>{
-        'instanceId': instanceId,
+        'eventId': eventId,
       },
     );
   }
 
   @override
   Future<void> updateEvent(
-    String instanceId, {
+    String eventId, {
     String? title,
     DateTime? startDate,
     DateTime? endDate,
@@ -165,7 +169,7 @@ class DeviceCalendarPlusIos extends DeviceCalendarPlusPlatform {
     await methodChannel.invokeMethod<void>(
       'updateEvent',
       <String, dynamic>{
-        'instanceId': instanceId,
+        'eventId': eventId,
         'title': title,
         'startDate': startDate?.millisecondsSinceEpoch,
         'endDate': endDate?.millisecondsSinceEpoch,

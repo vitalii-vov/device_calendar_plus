@@ -28,7 +28,7 @@ class MockDeviceCalendarPlusPlatform extends DeviceCalendarPlusPlatform
 
   // Callback to capture updateEvent arguments
   Future<void> Function(
-    String instanceId, {
+    String eventId, {
     String? title,
     DateTime? startDate,
     DateTime? endDate,
@@ -81,7 +81,7 @@ class MockDeviceCalendarPlusPlatform extends DeviceCalendarPlusPlatform
 
   void setUpdateEventCallback(
     Future<void> Function(
-      String instanceId, {
+      String eventId, {
       String? title,
       DateTime? startDate,
       DateTime? endDate,
@@ -167,7 +167,7 @@ class MockDeviceCalendarPlusPlatform extends DeviceCalendarPlusPlatform
   }
 
   @override
-  Future<Map<String, dynamic>?> getEvent(String instanceId) async {
+  Future<Map<String, dynamic>?> getEvent(String eventId, int? timestamp) async {
     if (_exceptionToThrow != null) {
       throw _exceptionToThrow!;
     }
@@ -175,7 +175,7 @@ class MockDeviceCalendarPlusPlatform extends DeviceCalendarPlusPlatform
   }
 
   @override
-  Future<void> showEventModal(String instanceId) async {
+  Future<void> showEventModal(String eventId, int? timestamp) async {
     if (_exceptionToThrow != null) {
       throw _exceptionToThrow!;
     }
@@ -217,7 +217,7 @@ class MockDeviceCalendarPlusPlatform extends DeviceCalendarPlusPlatform
   }
 
   @override
-  Future<void> deleteEvent(String instanceId) async {
+  Future<void> deleteEvent(String eventId) async {
     if (_exceptionToThrow != null) {
       throw _exceptionToThrow!;
     }
@@ -225,7 +225,7 @@ class MockDeviceCalendarPlusPlatform extends DeviceCalendarPlusPlatform
 
   @override
   Future<void> updateEvent(
-    String instanceId, {
+    String eventId, {
     String? title,
     DateTime? startDate,
     DateTime? endDate,
@@ -239,7 +239,7 @@ class MockDeviceCalendarPlusPlatform extends DeviceCalendarPlusPlatform
     }
     if (_updateEventCallback != null) {
       return _updateEventCallback!(
-        instanceId,
+        eventId,
         title: title,
         startDate: startDate,
         endDate: endDate,
