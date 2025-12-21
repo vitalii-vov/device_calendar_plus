@@ -11,24 +11,73 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+CYAN='\033[0;36m'
 NC='\033[0m' # No Color
+
+# Function to select device interactively
+select_device() {
+    echo -e "${BLUE}📱 Fetching devices:${NC}"
+    echo "" 
+    
+    # Get device list, skip header line
+    DEVICES=$(flutter devices 2>/dev/null | grep -E '•|−' | grep -v "No devices")
+    
+    if [ -z "$DEVICES" ]; then
+        echo -e "${RED}❌ No devices found${NC}"
+        echo ""
+        echo "Make sure you have:"
+        echo "  • An iOS simulator running (open Simulator.app)"
+        echo "  • An Android emulator running"
+        echo "  • A physical device connected"
+        exit 1
+    fi
+    
+    # Store devices in array
+    declare -a DEVICE_IDS
+    declare -a DEVICE_NAMES
+    INDEX=1
+    
+    while IFS= read -r line; do
+        # Extract device name (before the first •) and trim whitespace
+        NAME=$(echo "$line" | sed 's/ *•.*//' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+        # Extract device ID (between first and second •) and trim whitespace
+        ID=$(echo "$line" | sed 's/[^•]*• //' | sed 's/ •.*//' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+        
+        if [ -n "$ID" ]; then
+            DEVICE_IDS+=("$ID")
+            DEVICE_NAMES+=("$NAME")
+            echo -e "  ${CYAN}[$INDEX]${NC} $NAME"
+            echo -e "      ${YELLOW}$ID${NC}"
+            echo ""
+            ((INDEX++))
+        fi
+    done <<< "$DEVICES"
+    
+    if [ ${#DEVICE_IDS[@]} -eq 0 ]; then
+        echo -e "${RED}❌ Could not parse device list${NC}"
+        exit 1
+    fi
+    
+    echo -e "${GREEN}Select a device [1-$((INDEX-1))]:${NC} "
+    read -r SELECTION
+    
+    # Validate selection
+    if ! [[ "$SELECTION" =~ ^[0-9]+$ ]] || [ "$SELECTION" -lt 1 ] || [ "$SELECTION" -gt $((INDEX-1)) ]; then
+        echo -e "${RED}❌ Invalid selection${NC}"
+        exit 1
+    fi
+    
+    DEVICE_ID="${DEVICE_IDS[$((SELECTION-1))]}"
+    echo ""
+    echo -e "${GREEN}✓${NC} Selected: ${DEVICE_NAMES[$((SELECTION-1))]}"
+}
 
 # Check if device ID is provided
 if [ -z "$1" ]; then
-    echo -e "${RED}❌ Error: Device ID required${NC}"
-    echo ""
-    echo "Usage: $0 <device-id>"
-    echo ""
-    echo "Find device IDs with: flutter devices"
-    echo ""
-    echo "Examples:"
-    echo "  $0 F0A86A59-EB1B-4AA2-B487-8D3AA46664D8  # iOS simulator"
-    echo "  $0 emulator-5554                          # Android emulator"
-    echo "  $0 booted                                 # Currently booted iOS simulator"
-    exit 1
+    select_device
+else
+    DEVICE_ID="$1"
 fi
-
-DEVICE_ID="$1"
 
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${BLUE}  Device Calendar Plus - Integration Tests${NC}"
