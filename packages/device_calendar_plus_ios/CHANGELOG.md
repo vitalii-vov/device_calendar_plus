@@ -1,3 +1,8 @@
+## 0.3.4 - 2026-02-08
+
+### Added
+- Swift Package Manager support (CocoaPods continues to work as before)
+
 ## 0.3.3 - 2025-12-21
 
 ### Fixed
