@@ -32,6 +32,10 @@ class DeviceCalendarPlusAndroidPlugin :
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "device_calendar_plus_android")
         channel.setMethodCallHandler(this)
+
+        val appContext = flutterPluginBinding.applicationContext
+        calendarService = CalendarService(appContext)
+        eventsService = EventsService(appContext)
     }
 
     override fun onMethodCall(call: MethodCall, result: Result) {
@@ -466,13 +470,13 @@ class DeviceCalendarPlusAndroidPlugin :
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
+        calendarService = null
+        eventsService = null
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         activity = binding.activity
         permissionService = PermissionService(binding.activity)
-        calendarService = CalendarService(binding.activity)
-        eventsService = EventsService(binding.activity)
         binding.addRequestPermissionsResultListener(this)
         binding.addActivityResultListener(this)
     }
@@ -480,16 +484,12 @@ class DeviceCalendarPlusAndroidPlugin :
     override fun onDetachedFromActivityForConfigChanges() {
         activity = null
         permissionService = null
-        calendarService = null
-        eventsService = null
         showEventModalResult = null
     }
 
     override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
         activity = binding.activity
         permissionService = PermissionService(binding.activity)
-        calendarService = CalendarService(binding.activity)
-        eventsService = EventsService(binding.activity)
         binding.addRequestPermissionsResultListener(this)
         binding.addActivityResultListener(this)
     }
@@ -497,8 +497,6 @@ class DeviceCalendarPlusAndroidPlugin :
     override fun onDetachedFromActivity() {
         activity = null
         permissionService = null
-        calendarService = null
-        eventsService = null
         showEventModalResult = null
     }
 }
